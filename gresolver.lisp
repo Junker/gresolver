@@ -6,6 +6,7 @@
   "resolves hostname to determine its associated IP address(es).
    key :FAMILY can be :IPV4 or :IPV6.
    e.g.: (lookup-by-name \"example.org\" :family :ipv4)"
+  (check-type hostname string)
   (let ((flags (ecase family
                  (:ipv4 gio:+resolver-name-lookup-flags-ipv4-only+)
                  (:ipv6 gio:+resolver-name-lookup-flags-ipv6-only+)
@@ -16,11 +17,14 @@
 
 (defun lookup-by-address (address)
   "reverse-resolves address to determine its associated hostname."
+  (check-type address string)
   (gio:resolver-lookup-by-address *resolver* (gio:make-inet-address :string address) nil))
 
 (defun lookup-service (service protocol domain)
   "performs a DNS SRV lookup for the given service and protocol in the given domain and returns a list of records
    e.g.: (lookup-service \"ldap\" \"tcp\" \"example.org\")"
+  (check-type service string)
+  (check-type protocol string)
   (mapcar (lambda (ptr)
             (let ((srv (gir-wrapper:pointer-object ptr 'gio:srv-target)))
               (list :hostname (gio:srv-target-hostname srv)
@@ -34,6 +38,7 @@
   "performs a DNS record lookup for the given rrname and returns a list of records
    record-type can be one of (:SRV :MX :TXT :SOA :NS).
    e.g.: (lookup-records \"example.org\" :txt)"
+  (check-type rrname string)
   (let ((grectype (ecase record-type
                     (:srv gio:+resolver-record-type-srv+)
                     (:mx gio:+resolver-record-type-mx+)
